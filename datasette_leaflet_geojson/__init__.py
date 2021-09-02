@@ -1,5 +1,7 @@
 from datasette import hookimpl
 import json
+import os
+import textwrap
 
 GEOJSON_TYPES = {
     "Point",
@@ -65,6 +67,12 @@ def extra_body_script(datasette, database, table):
         )
         or {}
     )
-    return "window.DATASETTE_LEAFLET_GEOJSON_DEFAULT_MAPS_TO_LOAD = {};".format(
-        json.dumps(config.get("default_maps_to_load") or 10)
-    )
+    return textwrap.dedent(
+        """
+        window.DATASETTE_LEAFLET_GEOJSON_DEFAULT_MAPS_TO_LOAD = {};
+        window.GOOGLE_API_KEY = "{}";
+        """.format(
+                json.dumps(config.get("default_maps_to_load") or 10),
+                os.environ["GOOGLE_API_KEY"],
+            )
+        )

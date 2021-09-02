@@ -3,16 +3,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let loaded = [];
     function hasLoaded() {
       loaded.push(this);
-      if (loaded.length == 2) {
+      if (loaded.length == 4) {
         callback();
       }
     }
-    let stylesheet = document.createElement("link");
-    stylesheet.setAttribute("rel", "stylesheet");
-    stylesheet.setAttribute("href", datasette.leaflet.CSS_URL);
-    stylesheet.onload = hasLoaded;
-    document.head.appendChild(stylesheet);
+    let leafletStylesheet = document.createElement("link");
+    leafletStylesheet.setAttribute("rel", "stylesheet");
+    leafletStylesheet.setAttribute("href", datasette.leaflet.CSS_URL);
+    leafletStylesheet.onload = hasLoaded;
+    document.head.appendChild(leafletStylesheet);
+    let googleMapsScript = document.createElement("script");
+    googleMapsScript.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + window.GOOGLE_API_KEY);
+    googleMapsScript.async = true;
+    googleMapsScript.onload = hasLoaded;
+    document.head.appendChild(googleMapsScript);
     import(datasette.leaflet.JAVASCRIPT_URL).then(hasLoaded);
+    import("https://unpkg.com/leaflet.gridlayer.googlemutant@0.13.4/dist/Leaflet.GoogleMutant.js").then(hasLoaded);
   };
   const getFullNodeText = (el) => {
     // https://stackoverflow.com/a/4412151
@@ -35,9 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "Feature",
     "FeatureCollection",
   ]);
-  const attribution =
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-  const tilesUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   function upgradeTd({ td, data }, activate) {
     // OK, it should be GeoJSON - display it with leaflet
@@ -54,17 +57,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function addMap() {
       let map = L.map(el, {
         layers: [
-          L.tileLayer(tilesUrl, {
-            maxZoom: 19,
-            detectRetina: true,
-            attribution: attribution,
+          L.gridLayer.googleMutant({
+            type: "satellite",
           }),
         ],
       });
       let layer = L.geoJSON(data);
       layer.addTo(map);
       map.fitBounds(layer.getBounds(), {
-        maxZoom: 14,
+        maxZoom: 16,
       });
     }
     if (activate) {
