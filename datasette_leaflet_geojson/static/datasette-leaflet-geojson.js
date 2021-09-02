@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let layer = L.geoJSON(data);
       layer.addTo(map);
       map.fitBounds(layer.getBounds(), {
-        maxZoom: 16,
+        maxZoom: 18,
       });
     }
     if (activate) {
