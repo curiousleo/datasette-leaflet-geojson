@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loadDependencies = (callback) => {
-    let loaded = [];
+    let loaded = 0;
     function hasLoaded() {
-      loaded.push(this);
-      if (loaded.length == 4) {
-        callback();
+      loaded += 1;
+      if (loaded == 3) {
+        // GoogleMutant requires Leaflet and Google Maps.
+        import("https://unpkg.com/leaflet.gridlayer.googlemutant@0.13.4/dist/Leaflet.GoogleMutant.js")
+          .then(callback);
       }
     }
     let leafletStylesheet = document.createElement("link");
@@ -18,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
     googleMapsScript.onload = hasLoaded;
     document.head.appendChild(googleMapsScript);
     import(datasette.leaflet.JAVASCRIPT_URL).then(hasLoaded);
-    import("https://unpkg.com/leaflet.gridlayer.googlemutant@0.13.4/dist/Leaflet.GoogleMutant.js").then(hasLoaded);
   };
   const getFullNodeText = (el) => {
     // https://stackoverflow.com/a/4412151
